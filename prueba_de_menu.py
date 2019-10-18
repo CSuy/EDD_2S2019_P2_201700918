@@ -5,7 +5,6 @@ import socket
 import sys
 import os
 import time
-import threading
 
 class Menu_Practica():
     def menu(self):
@@ -69,13 +68,15 @@ class Menu_Practica():
         index_ = str(dd["INDEX"])
         timestamp_ = str(dd["TIMESTAMP"])
         class_ = str(dd["CLASS"])
-        data_ = str(dd["DATA"]).replace('\'','\"').replace(' ','')
+        data_ = str(dd["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
+        data_1 = str(dd["DATA"]).replace('\'','\"').replace(' ','')
         previous_ = str(dd["PREVIOUSHASH"])
         hash_prueba = self.SHA_256(index_,timestamp_,class_,data_,previous_)
-        temporal = {"HASH": hash_prueba}
-        archivo_json.update(temporal)
-        json_final = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
-        print("El json final es este: \n" + json_final)   
+        print("")
+        print("Su hash con null es:" + hash_prueba) 
+        print("")
+        hash_prueba1 = self.SHA_256(index_,timestamp_,class_,data_1,previous_)
+        print("")
+        print("Su hash con None es:" + hash_prueba1)       
 inicio = Menu_Practica()
 inicio.menu()
-#180434
