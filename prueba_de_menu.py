@@ -64,6 +64,8 @@ class Menu_Practica():
         }
         y = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
         y=y.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+        print("cadena generada por dumps")
+        print(y)
         dd = json.loads(y)
         index_ = str(dd["INDEX"])
         timestamp_ = str(dd["TIMESTAMP"])

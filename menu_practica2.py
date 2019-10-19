@@ -64,18 +64,18 @@ class Menu_Practica():
             "PREVIOUSHASH": "fd5f6d5fdfdf232Y232312QW12196255",
         }
         y = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
-        y=y.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
-        dd = json.loads(y)
-        index_ = str(dd["INDEX"])
-        timestamp_ = str(dd["TIMESTAMP"])
-        class_ = str(dd["CLASS"])
-        data_ = str(dd["DATA"]).replace('\'','\"').replace(' ','')
-        previous_ = str(dd["PREVIOUSHASH"])
-        hash_prueba = self.SHA_256(index_,timestamp_,class_,data_,previous_)
-        temporal = {"HASH": hash_prueba}
-        archivo_json.update(temporal)
-        json_final = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
-        print("El json final es este: \n" + json_final)   
+        #y=y.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+        #dd = json.loads(y)
+        #index_ = str(dd["INDEX"])
+        #timestamp_ = str(dd["TIMESTAMP"])
+        #class_ = str(dd["CLASS"])
+        #data_ = str(dd["DATA"]).replace('\'','\"').replace(' ','')
+        #previous_ = str(dd["PREVIOUSHASH"])
+        #hash_prueba = self.SHA_256(index_,timestamp_,class_,data_,previous_)
+        #temporal = {"HASH": hash_prueba}
+        #archivo_json.update(temporal)
+        #json_final = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
+        #print("El json final es este: \n" + json_final)   
 inicio = Menu_Practica()
 inicio.menu()
 #180434
