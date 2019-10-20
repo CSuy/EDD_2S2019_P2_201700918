@@ -82,3 +82,15 @@ class Menu_Practica():
         print("Su hash con None es:" + hash_prueba1)       
 inicio = Menu_Practica()
 inicio.menu()
+
+
+        #data_1 = data_
+        #datos = data_1.replace('\"value\"','').replace('right','').replace(':','')
+        #datos = datos.replace('left','').replace('\"','').replace(chr(123),'').replace(chr(125),'')
+        #alues = datos.split(',')
+        #arbolito = arbol()
+        #for i in range(0,len(alues)):
+        #    if alues[i] != "null":
+        #        arbolito.insertar(alues[i])
+        #arbolito.Graficar()
+        #arbolito.mostrar()
