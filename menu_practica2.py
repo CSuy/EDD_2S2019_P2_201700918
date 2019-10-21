@@ -11,10 +11,12 @@ import msvcrt
 from nodo import Nodo_AVL
 from nodo import Nodo_Lista
 from Lista_Doble import Lista_Doble
+from curses import KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN
+import curses
 
 lista_1 = Lista_Doble()
 json_memoria = ""
-bloques = 0
+json_arbol = ""
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
@@ -38,6 +40,7 @@ def servidor():
 
 def menu():
     while True:
+        os.system('cls')
         print("----------Practica 2---------")
         print("1.Insertar Bloque")
         print("2.Seleccionar Bloque")
@@ -45,10 +48,12 @@ def menu():
         print("4.Cerrar Programa")
         opcion = int(input("Que opcion desea realizar... "))
         if opcion == 1:
+            #os.system('cls')
             archivo_entrada = str(input("Ingrese el nombre del archivo con extension .csv...   "))
             insertarBloque(archivo_entrada,server)
             print("area de insertar bloques")
         elif opcion == 2:
+            seleccionar_bloques()
             print("Este apartado es para seleccionar bloques")
         elif opcion == 3:
             lista_1.graficar()
@@ -59,7 +64,6 @@ def menu():
 
 def insertarBloque(archivo, servidor1):
     global json_memoria
-    global bloques
     lista = [] #creamos una lista temporal
     try:
         with open(archivo) as f:
@@ -123,14 +127,12 @@ def insertarBloque(archivo, servidor1):
 def analisis_json(cadena):
         cadena1 = str(cadena)
         global json_memoria
-        global bloques
         if cadena1.find("true") != -1:
             print("recibiste un true")
             try:
                 if json_memoria != "":
                     lista_1.insertar(json_memoria)
                     print("nodo insertado a la lista")
-                    bloques = bloques + 1
             except Exception:
                 print("no se pudo insertar")
         elif cadena1.find("false") != -1:
@@ -161,6 +163,34 @@ def analisis_json(cadena):
                 print("Error primer try")
         else:
             print(cadena)
+
+def seleccionar_bloques():
+    global json_arbol
+    pos = 1
+    aux = lista_1.menu_bloques(1)
+    print(aux)
+    while True:
+        key = msvcrt.kbhit()
+        if key:
+            key1 = ord(msvcrt.getch())
+            if key1 == ord('d'):
+                if pos > lista_1.tam:
+                    pos = lista_1.tam
+                else:
+                    pos += 1
+                os.system('cls')
+                aux = lista_1.menu_bloques(pos)
+                print(aux)
+            elif key1 == ord('a'):
+                if pos < 1:
+                    pos = 1
+                else:
+                    pos -= 1
+                os.system('cls')
+                aux = lista_1.menu_bloques(pos)
+                print(aux)
+            elif key1 == ord('w'):
+                break           
 
 
 def SHA_256(index1, timestamp1, class1, data1, previousH):
