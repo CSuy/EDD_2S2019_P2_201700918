@@ -9,6 +9,7 @@ import threading
 import select
 import msvcrt
 from nodo import Nodo_AVL
+from nodo import Nodo_Lista
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 IP_address = str(sys.argv[1])
@@ -81,22 +82,40 @@ def insertarBloque(archivo, servidor1):
     temporal = {"HASH": hash_prueba}
     archivo_json.update(temporal)
     json_final = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
-    server.sendall(bytes(str(json_final).encode('utf-8')))
+    server.sendall(str(json_final).encode('utf-8'))
 
 def analisis_json(cadena):
-    try:
-        json_analizar = json.loads(cadena)
-        try:
-            index_ = str(json_analizar["INDEX"])
-            timestamp_ = str(json_analizar["TIMESTAMP"])
-            class_ = str(json_analizar["CLASS"])
-            data_ = str(json_analizar["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
-            previous_ = str(json_analizar["PREVIOUSHASH"])
-            hash_prueba = SHA_256(index_,timestamp_,class_,data_,previous_)
-        except Exception:
-            print("")
-    except Exception:
-        print(cadena)
+        cadena1 = str(cadena)
+        if cadena1.find("true") != -1:
+            print("recibiste un true")
+        elif cadena1.find("false") != -1:
+            print("recibiste un false")
+        elif cadena1.find("INDEX") != -1:
+            try:
+                json1 = cadena.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+                json_analizar = json.loads(json1)
+                #verdadero = 'true'
+                #falso = 'false'
+                try:
+                    index_ = str(json_analizar["INDEX"])
+                    timestamp_ = str(json_analizar["TIMESTAMP"])
+                    class_ = str(json_analizar["CLASS"])
+                    data_ = str(json_analizar["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
+                    previous_ = str(json_analizar["PREVIOUSHASH"])
+                    hash_prueba = SHA_256(index_,timestamp_,class_,data_,previous_)
+                    hash_analizar = str(json_analizar["HASH"])
+                    if hash_prueba == hash_analizar:
+                        server.sendall("true".encode('utf-8'))
+                        print("mande verdadero: ")
+                    else:
+                        server.sendall("false".encode('utf-8'))
+                        print("mande falso:")
+                except Exception:
+                    print("error segundo try")
+            except Exception:
+                print("Error primer try")
+        else:
+            print(cadena)
 
 
 def SHA_256(index1, timestamp1, class1, data1, previousH):
