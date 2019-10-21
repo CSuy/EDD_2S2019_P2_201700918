@@ -169,6 +169,7 @@ def seleccionar_bloques():
     os.system('cls')
     pos = 1
     aux = lista_1.menu_bloques(1)
+    aux1 = lista_1.buscar(pos)
     print(aux)
     while True:
         key = msvcrt.kbhit()
@@ -180,6 +181,7 @@ def seleccionar_bloques():
                 else:
                     pos += 1
                 os.system('cls')
+                aux1 = lista_1.buscar(pos)
                 aux = lista_1.menu_bloques(pos)
                 print(aux)
             elif key1 == ord('a'):
@@ -188,9 +190,11 @@ def seleccionar_bloques():
                 else:
                     pos -= 1
                 os.system('cls')
+                aux1 = lista_1.buscar(pos)
                 aux = lista_1.menu_bloques(pos)
                 print(aux)
             elif key1 == ord('w'):
+                json_arbol=aux1
                 break           
 
 
