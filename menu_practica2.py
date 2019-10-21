@@ -10,7 +10,11 @@ import select
 import msvcrt
 from nodo import Nodo_AVL
 from nodo import Nodo_Lista
+from Lista_Doble import Lista_Doble
 
+lista_1 = Lista_Doble()
+json_memoria = ""
+bloques = 0
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
@@ -47,12 +51,15 @@ def menu():
         elif opcion == 2:
             print("Este apartado es para seleccionar bloques")
         elif opcion == 3:
+            lista_1.graficar()
             print("area para realizar reportes")
         elif opcion == 4:
             print("Gracias :v")
             break
 
 def insertarBloque(archivo, servidor1):
+    global json_memoria
+    global bloques
     lista = [] #creamos una lista temporal
     try:
         with open(archivo) as f:
@@ -63,39 +70,77 @@ def insertarBloque(archivo, servidor1):
     except Exception:
         archivo = ""
     lista1=lista[3].replace(' ','')
-    archivo_json={
-        "INDEX":2,
-        "TIMESTAMP": "02-10-19-::14:30:25",
-        "CLASS": lista[1],
-        "DATA": lista1,
-        "PREVIOUSHASH": "fd5f6d5fdfdf232Y232312QW12196255",
-    }
-    y = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
-    y=y.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
-    dd = json.loads(y)
-    index_ = str(dd["INDEX"])
-    timestamp_ = str(dd["TIMESTAMP"])
-    class_ = str(dd["CLASS"])
-    data_ = str(dd["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
-    previous_ = str(dd["PREVIOUSHASH"])
-    hash_prueba = SHA_256(index_,timestamp_,class_,data_,previous_)
-    temporal = {"HASH": hash_prueba}
-    archivo_json.update(temporal)
-    json_final = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
-    server.sendall(str(json_final).encode('utf-8'))
+    if lista_1.estaVacia():
+        archivo_json={
+            "INDEX":lista_1.tam,
+            "TIMESTAMP": time.strftime(("%d-%m-%y-::%H:%M:%S")),
+            "CLASS": lista[1],
+            "DATA": lista1,
+            "PREVIOUSHASH": "0000",
+        }
+        y = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
+        y=y.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+        dd = json.loads(y)
+        index_ = str(dd["INDEX"])
+        timestamp_ = str(dd["TIMESTAMP"])
+        class_ = str(dd["CLASS"])
+        data_ = str(dd["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
+        previous_ = str(dd["PREVIOUSHASH"])
+        hash_prueba = SHA_256(index_,timestamp_,class_,data_,previous_)
+        temporal = {"HASH": hash_prueba}
+        archivo_json.update(temporal)
+        json_final = json.dumps(archivo_json).replace("\\n",'').replace("\\",'')
+        json_memoria = json_final.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+        server.sendall(str(json_final).encode('utf-8'))
+    else:
+        try:
+            json_prueba = lista_1.buscar(lista_1.tam)
+            x = json.loads(json_prueba)
+            archivo_json1={
+                "INDEX":lista_1.tam,
+                "TIMESTAMP": time.strftime(("%d-%m-%y-::%H:%M:%S")),
+                "CLASS": lista[1],
+                "DATA": lista1,
+                "PREVIOUSHASH": str(x["HASH"]),
+            }
+            y1 = json.dumps(archivo_json1).replace("\\n",'').replace("\\",'')
+            y1=y1.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+            dd1 = json.loads(y1)
+            index_1 = str(dd1["INDEX"])
+            timestamp_1 = str(dd1["TIMESTAMP"])
+            class_1 = str(dd1["CLASS"])
+            data_1 = str(dd1["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
+            previous_1 = str(dd1["PREVIOUSHASH"])
+            hash_prueba1 = SHA_256(index_1,timestamp_1,class_1,data_1,previous_1)
+            temporal1 = {"HASH": hash_prueba1}
+            archivo_json1.update(temporal1)
+            json_final1 = json.dumps(archivo_json1).replace("\\n",'').replace("\\",'')
+            json_memoria = json_final1.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+            server.sendall(str(json_final1).encode('utf-8'))
+        except Exception:
+            print("error al buscar el json")
 
 def analisis_json(cadena):
         cadena1 = str(cadena)
+        global json_memoria
+        global bloques
         if cadena1.find("true") != -1:
             print("recibiste un true")
+            try:
+                if json_memoria != "":
+                    lista_1.insertar(json_memoria)
+                    print("nodo insertado a la lista")
+                    bloques = bloques + 1
+            except Exception:
+                print("no se pudo insertar")
         elif cadena1.find("false") != -1:
+            json_memoria = ""
             print("recibiste un false")
         elif cadena1.find("INDEX") != -1:
             try:
                 json1 = cadena.replace(chr(34)+chr(123),chr(123)).replace(chr(125)+chr(34),chr(125))
+                json_memoria = json1
                 json_analizar = json.loads(json1)
-                #verdadero = 'true'
-                #falso = 'false'
                 try:
                     index_ = str(json_analizar["INDEX"])
                     timestamp_ = str(json_analizar["TIMESTAMP"])

@@ -1,7 +1,8 @@
 class Nodo_Lista(): #Nodo que sirve para la Lista doble enlazada
-    def __init__(self):
+    def __init__(self, cadena):
         self.anterior = None
         self.siguiente = None
+        self.valor = cadena
 
 class Nodo_AVL():
     def __init__(self, valor):
