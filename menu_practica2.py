@@ -166,6 +166,7 @@ def analisis_json(cadena):
 
 def seleccionar_bloques():
     global json_arbol
+    os.system('cls')
     pos = 1
     aux = lista_1.menu_bloques(1)
     print(aux)
@@ -175,7 +176,7 @@ def seleccionar_bloques():
             key1 = ord(msvcrt.getch())
             if key1 == ord('d'):
                 if pos > lista_1.tam:
-                    pos = lista_1.tam
+                    pos = 1
                 else:
                     pos += 1
                 os.system('cls')
@@ -183,7 +184,7 @@ def seleccionar_bloques():
                 print(aux)
             elif key1 == ord('a'):
                 if pos < 1:
-                    pos = 1
+                    pos = lista_1.tam
                 else:
                     pos -= 1
                 os.system('cls')
