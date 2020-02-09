@@ -65,9 +65,21 @@ class Lista_Doble():
                     cadena = aux.valor
                 else:
                     aux = aux.siguiente
-        listados = list(cadena)
+        l = json.loads(cadena)
         cadena_final = ""
-        for j in range(150):
-            cadena_final = cadena_final + listados[j]
+        cadena_final1 = ""
+        cadena_final += "INDEX:"
+        cadena_final += str(l["INDEX"])
+        cadena_final += "\n TIMESTAMP:"
+        cadena_final += str(l["TIMESTAMP"])
+        cadena_final += "\n DATA:"
+        listados = list(str(l["DATA"]))
+        for j in range(80):
+            cadena_final1 = cadena_final1 + listados[j]
+        cadena_final += cadena_final1
+        cadena_final += "\n PREVIOUSHASH:"
+        cadena_final += str(l["PREVIOUSHASH"])
+        cadena_final += "\n HASH:"
+        cadena_final += str(l["HASH"])
         return cadena_final
         

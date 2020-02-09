@@ -9,4 +9,5 @@ class Nodo_AVL():
         self.valor = valor
         self.izquierdo = None
         self.derecho = None
+        self.height = 1
         

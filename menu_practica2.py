@@ -11,15 +11,19 @@ import msvcrt
 from nodo import Nodo_AVL
 from nodo import Nodo_Lista
 from Lista_Doble import Lista_Doble
+from Arbol_AVL import arbol_AVL
+
 from curses import KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN
 import curses
 
 lista_1 = Lista_Doble()
+arbolavl = arbol_AVL()
 json_memoria = ""
 json_arbol = ""
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
+rootAVL = None
 def servidor():
     if len(sys.argv) != 3:
         print ("Correct usage: script, IP address, port number")
@@ -39,8 +43,8 @@ def servidor():
     server.close()
 
 def menu():
+    global json_arbol
     while True:
-        os.system('cls')
         print("----------Practica 2---------")
         print("1.Insertar Bloque")
         print("2.Seleccionar Bloque")
@@ -56,7 +60,18 @@ def menu():
             seleccionar_bloques()
             print("Este apartado es para seleccionar bloques")
         elif opcion == 3:
-            lista_1.graficar()
+            x = json.loads(json_arbol)
+            data_ = str(x["DATA"]).replace('\'','\"').replace(' ','').replace("None","null")
+            data_1 = data_
+            datos = data_1.replace('\"value\"','').replace('right','').replace(':','')
+            datos = datos.replace('left','').replace('\"','').replace(chr(123),'').replace(chr(125),'')
+            alues = datos.split(',')
+            arbolito = arbol()
+            for i in range(0,len(alues)):
+                if alues[i] != "null":
+                    arbolito.insertar(alues[i])
+            arbolito.inorder1()
+            menu_reportes()
             print("area para realizar reportes")
         elif opcion == 4:
             print("Gracias :v")
@@ -166,6 +181,9 @@ def analisis_json(cadena):
 
 def seleccionar_bloques():
     global json_arbol
+    global rootAVL
+    json_arbol = None
+    rootAVL = None
     os.system('cls')
     pos = 1
     aux = lista_1.menu_bloques(1)
@@ -197,12 +215,124 @@ def seleccionar_bloques():
                 json_arbol=aux1
                 break           
 
+def menu_reportes():
+    global rootAVL
+    while True:
+        print("----------Reportes Practica 2---------")
+        print("1.Reporte de Arbol")
+        print("2.Reporte de Bloques")
+        print("3.Recorrido inorden")
+        print("4.Recorrido preorden")
+        print("5.Recorrido posorden")
+        opcion = int(input("Que opcion desea realizar... "))
+        if opcion == 1:
+            #print(str(rootAVL.valor))
+            arbolavl.Graficar(rootAVL)
+            print("area de insertar bloques")
+        elif opcion == 2:
+            lista_1.graficar()
+            print("Este apartado es para seleccionar bloques")
+        elif opcion == 3:
+            print("INICIO ->")
+            arbolavl.inOrdenC(rootAVL)
+            print("FIN")
+            arbolavl.GraficaIn(rootAVL)
+            print("area para realizar reportes")
+        elif opcion == 4:
+            print("INICIO ->")
+            arbolavl.preOrdenC(rootAVL)
+            print("FIN")
+            arbolavl.GraficaPre(rootAVL)
+            print("Gracias :v")
+        elif opcion == 5:
+            print("INICIO ->")
+            arbolavl.posOrdenC(rootAVL)
+            print("FIN")
+            arbolavl.GraficaPos(rootAVL)
+            print("Gracias :v")
+        elif opcion == 6:
+            break
+        
 
 def SHA_256(index1, timestamp1, class1, data1, previousH):
     bloque_analizado = str(index1).encode('utf-8') + str(timestamp1).encode('utf-8') + str(class1).encode('utf-8') + str(data1).encode('utf-8') + str(previousH).encode('utf-8')
     sha = hashlib.sha256(bloque_analizado).hexdigest()
     return str(sha)
 
+class arbol():
+    global rootAVL
+    def __init__(self):
+        self.root = None
+
+    def insertar(self,dato):
+        nuevo = Nodo_AVL(dato)
+        if self.root is None:
+            self.root = nuevo
+        else:
+            self._insertar1(self.root,nuevo)
+    
+    def _insertar1(self, raiz, datos):
+        if raiz is None:
+            raiz = datos
+        else:
+            if raiz.valor > datos.valor :
+                raiz.izquierdo = self._insertar1(raiz.izquierdo,datos)
+            else:
+                raiz.derecho = self._insertar1(raiz.derecho,datos)
+        return raiz
+
+    def mostrar(self):
+        valores = str(self._mostrar1(self.root.izquierdo))
+        print(valores)
+
+    def _mostrar1(self,raiz):
+        if raiz is not None:
+            return raiz.valor
+
+    def Graficar(self):
+        archivo = "Arbol.jpg"
+        a = open("Arbol1.dot","w")
+        a.write("digraph lista{\n")
+        a.write("node [shape = circle, style=filled, fillcolor=seashell2];\n")
+        a.write(self._graficar1(self.root))
+        a.write(" \n}")
+        a.close()
+        os.system("dot -Tjpg Arbol1.dot -o"+archivo)
+        os.system(archivo)       
+
+    def _graficar1(self,raiz):
+        cuerpo = ""
+        if(raiz is not None):
+            cuerpo +="\""
+            cuerpo += raiz.valor
+            cuerpo +="\""
+            cuerpo += ";"
+            if raiz.izquierdo is not None :
+                cuerpo +="\""
+                cuerpo += raiz.valor
+                cuerpo +="\""
+                cuerpo += " -> \n"
+                cuerpo += self._graficar1(raiz.izquierdo)
+            if raiz.derecho is not None:
+                cuerpo +="\""
+                cuerpo += raiz.valor
+                cuerpo +="\""
+                cuerpo += " -> \n"
+                cuerpo += self._graficar1(raiz.derecho)
+        return cuerpo
+    
+    def inorder1(self):
+        self._iord(self.root)
+
+    def _iord(self, raiz):
+        global rootAVL
+        if raiz.izquierdo is not None:
+            self._iord(raiz.izquierdo)
+        if raiz is not None:
+            rootAVL = arbolavl.insertar(rootAVL,raiz.valor)
+        if raiz.derecho is not None:
+            self._iord(raiz.derecho)
+     
 hilo2 = threading.Thread(target=menu)
 hilo1 = threading.Thread(target=servidor)
 hilo1.start()
